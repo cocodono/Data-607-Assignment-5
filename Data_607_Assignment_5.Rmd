@@ -5,25 +5,81 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
+## Introduction:
+
+I know that this assignment requires we use dplyr and tidyr, and I know that 
+melt (from the reshape2 package) will be helpful in the process of combining all
+of the city columns in a column for the city name and a column for the frequency.
+Additionally, I will have to think of a creative solution to problem created
+with not all airlines names being missing from the airline name column. The point
+of this assignment is to work with the simple dataset provided, and I want to
+make sure that my work would still work with a larger dataset. I essentially do
+not want to be hardcoding anything, despite the fact that could be possible given
+the smaller size of this data set.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
+## Loading necessary packages
 
 ```{r}
 library(dplyr)
+library(tidyr)
+library(reshape2)
 ```
 
-
+## Name the two columns that were missing names
 
 ```{r}
 messy_flights <- read.csv('flight_delays.csv')
 
-colnames(messy_flights)
+messy_flights
 
 messy_flights <- messy_flights %>%
-  mutate(Airline = X, Status = X.1)
+  rename(Airline = X, Status = X.1, 
+         'Los Angeles' = Los.Angeles, 
+         'San Diego' = San.Diego,
+         'San Francisco' = San.Francisco)
 
 messy_flights
 ```
+
+## Filling in missing values for airlines
+
+```{r}
+for (x in 1:nrow(messy_flights)) {
+  if (messy_flights$Status[x] == 'delayed') {
+    messy_flights$Airline[x] = messy_flights$Airline[x-1]
+  }
+}
+```
+
+## Getting rid of the blank row
+
+```{r}
+messy_flights <- messy_flights %>% drop_na()
+```
+
+## Melting the city columns together
+
+```{r}
+flights <- melt(messy_flights, flights = c(Airline, Status)) %>%
+  rename(City = variable, Frequency = value)
+
+knitr::kable(head(flights))
+```
+
+
+
+```{r}
+flights %>%
+  select(City, Status, Frequency) %>%
+  group_by(City, Status)
+```
+
+
+
+
+
+
