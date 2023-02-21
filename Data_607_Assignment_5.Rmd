@@ -1,0 +1,29 @@
+---
+title: "Data 607 Assignment 5"
+author: "Coco Donovan"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+library(dplyr)
+```
+
+
+
+```{r}
+messy_flights <- read.csv('flight_delays.csv')
+
+colnames(messy_flights)
+
+messy_flights <- messy_flights %>%
+  mutate(Airline = X, Status = X.1)
+
+messy_flights
+```
