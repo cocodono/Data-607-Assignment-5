@@ -70,13 +70,46 @@ flights <- melt(messy_flights, flights = c(Airline, Status)) %>%
 knitr::kable(head(flights))
 ```
 
-
+## Delays by City
 
 ```{r}
-flights %>%
-  select(City, Status, Frequency) %>%
-  group_by(City, Status)
+by_city <- flights %>%
+  group_by(City) %>%
+  summarise(percent_delayed = round(100 * sum(Frequency[Status == 'delayed'])*1.0/sum(Frequency),2), total_flights = sum(Frequency), delayed_flights = sum(Frequency[Status == 'delayed']))
+
+knitr::kable(by_city)
 ```
+
+## Delays by Airline
+
+```{r}
+by_airline <- flights %>%
+  group_by(Airline) %>%
+  summarise(percent_delayed = round(100 * sum(Frequency[Status == 'delayed'])*1.0/sum(Frequency),2), total_flights = sum(Frequency), delayed_flights = sum(Frequency[Status == 'delayed']))
+
+knitr::kable(by_airline)
+```
+
+## Delays by Airline and City
+
+```{r}
+by_airline_city <- flights %>%
+  group_by(Airline, City) %>%
+  summarise(percent_delayed = round(100 * sum(Frequency[Status == 'delayed'])*1.0/sum(Frequency),2), total_flights = sum(Frequency), delayed_flights = sum(Frequency[Status == 'delayed'])) %>%
+  arrange(City)
+
+knitr::kable(by_airline_city)
+```
+
+## Conclusion:
+
+From my analysis, based solely on this dataset, a few things are clear. The
+first discovery I found is that San Francisco seems to experience the highest
+percentages of delays on all flights. Other cities had more delayed flights, but 
+in terms of percent of total San Francisco was by clearly the most delayed
+airport, ALASKA experiences more delays, by percentage, than does AM WEST and 
+lastly, think twice about combining AM WEST and San Francisco for your travel 
+plans because there is a decent chance you will be delayed.
 
 
 
